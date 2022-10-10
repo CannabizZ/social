@@ -13,6 +13,7 @@ services:
     links:
       - php
   php:
+    container_name: social-php-fpm
     build: ./images/php
     links:
       - mysql
