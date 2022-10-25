@@ -7,4 +7,4 @@
 `docker exec -i social-php-fpm composer install`
 
 ### Run database migration
-`docker exec -i social-mysql mysql -uroot -psecret social < datadump.sql`
+`docker exec -i social-mysql mysql -uroot -psecret < datadump.sql`

@@ -1,4 +1,6 @@
 
+CREATE DATABASE social;
+
 -- DROP TABLE IF EXISTS social.user;
 -- DROP TABLE IF EXISTS social.interest;
 -- DROP TABLE IF EXISTS social.user_interest;
