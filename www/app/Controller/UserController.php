@@ -104,4 +104,14 @@ class UserController extends AbstractController
 
         return $this->responseSuccess();
     }
+
+    /**
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function seed(): Response
+    {
+        //(new UserStorage())->seed();
+        return $this->responseSuccess();
+    }
 }

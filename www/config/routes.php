@@ -18,6 +18,7 @@ Router::get('/user/([\d]+)', UserController::class, 'get');
 Router::get('/user/([\d]+)/pages', PageController::class, 'getByUser');
 Router::get('/user/([\d]+)/friends', UserController::class, 'getFriends');
 Router::put('/user/([\d]+)/friend/([\d]+)', UserController::class, 'makeFriend');
+Router::get('/user/seed', UserController::class, 'seed');
 
 
 /**

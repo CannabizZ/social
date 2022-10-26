@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Storage;
 
 use App\Exception\RuntimeException;
+use App\Helper\PasswordHelper;
 use App\Model\UserModel;
 use PDO;
 use Throwable;
@@ -140,6 +141,49 @@ class UserStorage extends AbstractStorage
         }
 
         return $userId;
+    }
+
+    /**
+     * @return void
+     * @throws RuntimeException
+     */
+    public function seed(): void
+    {
+        ini_set('memory_limit', '1G');
+
+        $names = json_decode(file_get_contents(__DIR__ . '/../../config/russian_names.json'), true);
+        $surnames = array_column(json_decode(file_get_contents(__DIR__ . '/../../config/russian_surnames.json'), true),'Surname');
+        $namesCount = count($names) - 1;
+        $surnamesCount = count($surnames) - 1;
+        $cities = ['spb','msk','xyz'];
+        $password = PasswordHelper::getHash('pass');
+        $values = [];
+        $i = 0;
+
+        while (true) {
+            $name = $names[rand(0, $namesCount)];
+            $surname = $surnames[rand(0,$surnamesCount)];
+            $values[] = "('" . implode("','", [
+                    'firstName' => $name['Name'],
+                    'lastName' => $surname,
+                    'years' => rand(1,80),
+                    'sex' => $name['Sex'] === 'Ж' ? 'female' : 'male',
+                    'city' => $cities[rand(0,2)],
+                    'password' => $password
+                ])  . "')";
+            ++$i;
+            if ($i > 1000000) {
+                break;
+            }
+        }
+
+        foreach (array_chunk($values, 100) as $chunk) {
+            $this->query('
+                INSERT INTO user 
+                        (firstName,lastName,years,sex,city,password) 
+                    VALUES ' . implode(',', $chunk) . '
+            ');
+        }
     }
 
     /**
