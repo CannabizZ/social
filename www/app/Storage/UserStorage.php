@@ -11,6 +11,7 @@ use Throwable;
 
 class UserStorage extends AbstractStorage
 {
+    protected const TABLE = 'user';
 
     /**
      * @param int $id
@@ -50,7 +51,7 @@ class UserStorage extends AbstractStorage
                 u.password,
                 JSON_OBJECTAGG(IFNULL(i.id, \'\'), i.`name`) AS interests
             FROM 
-                user AS u
+                ' . self::TABLE . ' AS u
             LEFT JOIN 
                 user_interest AS ui
             ON
@@ -103,7 +104,7 @@ class UserStorage extends AbstractStorage
             $this->db->beginTransaction();
 
             $statement = $this->db->prepare("
-                INSERT INTO user 
+                INSERT INTO ' . self::TABLE . ' 
                         (firstName,lastName,years,sex,city,password) 
                     VALUES(
                         ?,?,?,?,?,?
@@ -179,11 +180,41 @@ class UserStorage extends AbstractStorage
 
         foreach (array_chunk($values, 100) as $chunk) {
             $this->query('
-                INSERT INTO user 
+                INSERT INTO ' . self::TABLE . ' 
                         (firstName,lastName,years,sex,city,password) 
                     VALUES ' . implode(',', $chunk) . '
             ');
         }
+    }
+
+    /**
+     * @param string $term
+     * @return int[]
+     */
+    public function searchByNameAndLastName(string $term): array
+    {
+        $statement = $this->db->prepare('
+            SELECT 
+                id
+            FROM 
+                ' . self::TABLE . ' 
+            WHERE 
+                 firstName LIKE ? and lastName LIKE ?
+            ORDER BY id
+            '
+        );
+
+        $statement->execute([
+            $term,
+            $term
+        ]);
+
+        $userIds = array_column($statement->fetchAll(PDO::FETCH_ASSOC) ?? [], 'id');
+        if (empty($userIds)) {
+            return [];
+        }
+
+        return $userIds;
     }
 
     /**

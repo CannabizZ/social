@@ -31,7 +31,15 @@ abstract class AbstractController
      */
     protected function getUserModelById(int $userId): UserModel
     {
-        return (new UserStorage())->get($userId);
+        return $this->getUserStorage()->get($userId);
+    }
+
+    /**
+     * @return UserStorage
+     */
+    protected function getUserStorage(): UserStorage
+    {
+        return new UserStorage();
     }
 
     /**

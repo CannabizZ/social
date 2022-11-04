@@ -24,7 +24,7 @@ class UserController extends AbstractController
     {
         $userModel = ValidationHelper::validateUserRegistration($this->request);
 
-        $userId = (new UserStorage())->create($userModel);
+        $userId = $this->getUserStorage()->create($userModel);
         $userModel->setId($userId);
 
         return $this->responseSuccess([
@@ -69,7 +69,7 @@ class UserController extends AbstractController
         $userModel = $this->getUserModelById($userId);
         $friendsModel = (new FriendStorage())->getByUserId($userModel->getId());
 
-        $friends = (new UserStorage())->getByIds($friendsModel->getFriendIds());
+        $friends = $this->getUserStorage()->getByIds($friendsModel->getFriendIds());
 
         return $this->responseSuccess(array_values(array_map(function (UserModel $userModel) {
             return [
@@ -113,5 +113,34 @@ class UserController extends AbstractController
     {
         //(new UserStorage())->seed();
         return $this->responseSuccess();
+    }
+
+    /**
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function search(): Response
+    {
+        $term = $this->request->query('term');
+        if (empty($term)) {
+            return $this->responseSuccess();
+        }
+
+        $term = $term . '%';
+
+        $userIds = $this->getUserStorage()->searchByNameAndLastName($term);
+        $userModels = $this->getUserStorage()->getByIds($userIds);
+
+        return $this->responseSuccess(array_values(array_map(function (UserModel $userModel) {
+            return [
+                'id' => $userModel->getId(),
+                'firstName' =>  $userModel->getFirstName(),
+                'lastName' => $userModel->getLastName(),
+                'years' => $userModel->getYears(),
+                'sex' => $userModel->getSex(),
+                'city' => $userModel->getCity(),
+                'interests' => $userModel->getInterests()
+            ];
+        }, $userModels)));
     }
 }
