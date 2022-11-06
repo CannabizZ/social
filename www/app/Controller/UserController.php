@@ -111,7 +111,7 @@ class UserController extends AbstractController
      */
     public function seed(): Response
     {
-        //(new UserStorage())->seed();
+        (new UserStorage())->seed();
         return $this->responseSuccess();
     }
 
