@@ -19,6 +19,11 @@ services:
       - mysql
     volumes:
       - ./www:/var/www
+    environment:
+      DB_USER: secret
+      DB_PASSWORD: password
+      DB_MASTER_HOSTS: mysql
+      DB_SLAVE_HOSTS: mysql
   mysql:
     container_name: social-mysql
     image: mysql:8

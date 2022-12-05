@@ -24,7 +24,8 @@ class UserController extends AbstractController
     {
         $userModel = ValidationHelper::validateUserRegistration($this->request);
 
-        $userId = $this->getUserStorage()->create($userModel);
+        $storage = $this->getUserStorage();
+        $userId = $storage->create($userModel);
         $userModel->setId($userId);
 
         return $this->responseSuccess([
@@ -46,7 +47,30 @@ class UserController extends AbstractController
      */
     public function get(int $userId): Response
     {
-        $userModel = $this->getUserModelById($userId);
+        $storage = $this->getUserStorage();
+        $userModel = $storage->get($userId);
+
+        return $this->responseSuccess([
+            'id' => $userModel->getId(),
+            'firstName' =>  $userModel->getFirstName(),
+            'lastName' => $userModel->getLastName(),
+            'years' => $userModel->getYears(),
+            'sex' => $userModel->getSex(),
+            'city' => $userModel->getCity(),
+            'interests' => $userModel->getInterests()
+        ]);
+    }
+
+    /**
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function getRandom(): Response
+    {
+        $storage = $this->getUserStorage();
+        $usersCount = $storage->count();
+        $userId = rand(1, $usersCount-1);
+        $userModel = $storage->get($userId);
 
         return $this->responseSuccess([
             'id' => $userModel->getId(),
@@ -66,7 +90,8 @@ class UserController extends AbstractController
      */
     public function getFriends(int $userId): Response
     {
-        $userModel = $this->getUserModelById($userId);
+        $storage = $this->getUserStorage();
+        $userModel = $storage->get($userId);
         $friendsModel = (new FriendStorage())->getByUserId($userModel->getId());
 
         $friends = $this->getUserStorage()->getByIds($friendsModel->getFriendIds());
@@ -92,26 +117,17 @@ class UserController extends AbstractController
      */
     public function makeFriend(int $userId, int $friendId): Response
     {
-        $userModel = $this->getUserModelById($userId);
+        $storage = $this->getUserStorage();
+        $userModel = $storage->get($userId);
         $friendsModel = (new FriendStorage())->getByUserId($userModel->getId());
         if (in_array($friendId, $friendsModel->getFriendIds())) {
             throw new ValidationException(sprintf('User #%s already a friend of user #%s', $userId, $friendId));
         }
 
-        $friendUserModel = $this->getUserModelById($friendId);
+        $friendUserModel = $storage->get($friendId);
 
         (new FriendStorage())->add($userModel, $friendUserModel);
 
-        return $this->responseSuccess();
-    }
-
-    /**
-     * @return Response
-     * @throws RuntimeException
-     */
-    public function seed(): Response
-    {
-        (new UserStorage())->seed();
         return $this->responseSuccess();
     }
 
@@ -128,8 +144,9 @@ class UserController extends AbstractController
 
         $term = $term . '%';
 
-        $userIds = $this->getUserStorage()->searchByNameAndLastName($term);
-        $userModels = $this->getUserStorage()->getByIds($userIds);
+        $storage = $this->getUserStorage();
+        $userIds = $storage->searchByNameAndLastName($term);
+        $userModels = $storage->getByIds($userIds);
 
         return $this->responseSuccess(array_values(array_map(function (UserModel $userModel) {
             return [

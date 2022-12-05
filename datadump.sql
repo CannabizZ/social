@@ -1,5 +1,5 @@
 
-CREATE DATABASE social;
+CREATE DATABASE IF NOT EXISTS social;
 
 -- DROP TABLE IF EXISTS social.user;
 -- DROP TABLE IF EXISTS social.interest;
@@ -26,8 +26,9 @@ CREATE TABLE IF NOT EXISTS social.interest
 
 CREATE TABLE IF NOT EXISTS social.user_interest
 (
-    userId int unsigned not null,
-    interestId int unsigned not null
+    userId     int unsigned not null,
+    interestId int unsigned not null,
+    primary key (userId, interestId)
 );
 
 CREATE TABLE IF NOT EXISTS social.user_page
@@ -39,7 +40,8 @@ CREATE TABLE IF NOT EXISTS social.user_page
 
 CREATE TABLE IF NOT EXISTS social.friends
 (
-    userId int unsigned not null,
-    friendUserId int unsigned not null
+    userId       int unsigned not null,
+    friendUserId int unsigned not null,
+    primary key (userId, friendUserId)
 );
 

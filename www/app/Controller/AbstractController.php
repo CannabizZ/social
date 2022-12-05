@@ -25,16 +25,6 @@ abstract class AbstractController
     }
 
     /**
-     * @param int $userId
-     * @return UserModel
-     * @throws RuntimeException
-     */
-    protected function getUserModelById(int $userId): UserModel
-    {
-        return $this->getUserStorage()->get($userId);
-    }
-
-    /**
      * @return UserStorage
      */
     protected function getUserStorage(): UserStorage

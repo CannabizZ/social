@@ -111,6 +111,7 @@ class Router
      */
     public static function prepareError(Throwable $throwable): Response
     {
+        header("HTTP/1.1 500 Internal Server Error");
         return (new Response())
             ->setStatus(Response::STATUS_ERROR)
             ->setData([

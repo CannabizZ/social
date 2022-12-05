@@ -36,7 +36,8 @@ class PageController extends AbstractController
      */
     public function create(int $userId): Response
     {
-        $userModel = $this->getUserModelById($userId);
+        $storage = $this->getUserStorage();
+        $userModel = $storage->get($userId);
 
         $content = $this->request->getBody()['content'] ?? null;
         if (empty($content)) {
@@ -56,7 +57,8 @@ class PageController extends AbstractController
      */
     public function getByUser(int $userId): Response
     {
-        $userModel = $this->getUserModelById($userId);
+        $storage = $this->getUserStorage();
+        $userModel = $storage->get($userId);
 
         $storage = new PageStorage();
         $pageModels = $storage->getPagesByUser($userModel->getId());

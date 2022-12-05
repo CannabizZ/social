@@ -4,14 +4,13 @@ declare(strict_types=1);
 namespace App\Storage;
 
 use App\Exception\RuntimeException;
-use App\Helper\PasswordHelper;
 use App\Model\UserModel;
 use PDO;
 use Throwable;
 
 class UserStorage extends AbstractStorage
 {
-    protected const TABLE = 'user';
+    public const TABLE = 'user';
 
     /**
      * @param int $id
@@ -145,49 +144,6 @@ class UserStorage extends AbstractStorage
     }
 
     /**
-     * @return void
-     * @throws RuntimeException
-     */
-    public function seed(): void
-    {
-        ini_set('memory_limit', '1G');
-
-        $names = json_decode(file_get_contents(__DIR__ . '/../../config/russian_names.json'), true);
-        $surnames = array_column(json_decode(file_get_contents(__DIR__ . '/../../config/russian_surnames.json'), true),'Surname');
-        $namesCount = count($names) - 1;
-        $surnamesCount = count($surnames) - 1;
-        $cities = ['spb','msk','xyz'];
-        $password = PasswordHelper::getHash('pass');
-        $values = [];
-        $i = 0;
-
-        while (true) {
-            $name = $names[rand(0, $namesCount)];
-            $surname = $surnames[rand(0,$surnamesCount)];
-            $values[] = "('" . implode("','", [
-                    'firstName' => $name['Name'],
-                    'lastName' => $surname,
-                    'years' => rand(1,80),
-                    'sex' => $name['Sex'] === 'Ж' ? 'female' : 'male',
-                    'city' => $cities[rand(0,2)],
-                    'password' => $password
-                ])  . "')";
-            ++$i;
-            if ($i > 1000000) {
-                break;
-            }
-        }
-
-        foreach (array_chunk($values, 100) as $chunk) {
-            $this->query('
-                INSERT INTO ' . self::TABLE . ' 
-                        (firstName,lastName,years,sex,city,password) 
-                    VALUES ' . implode(',', $chunk) . '
-            ');
-        }
-    }
-
-    /**
      * @param string $term
      * @return int[]
      */
@@ -218,10 +174,21 @@ class UserStorage extends AbstractStorage
     }
 
     /**
+     * @return int
+     * @throws RuntimeException
+     */
+    public function count(): int
+    {
+        return (int) $this->query('
+            SELECT COUNT(*) AS cnt FROM ' . self::TABLE
+        )->fetch(PDO::FETCH_ASSOC)['cnt'];
+    }
+
+    /**
      * @param string $interest
      * @return int|null
      */
-    protected function getInterestId(string $interest): ?int
+    public function getInterestId(string $interest): ?int
     {
         $statement = $this->db->prepare('
             SELECT 
@@ -247,7 +214,7 @@ class UserStorage extends AbstractStorage
      * @param string $interest
      * @return int
      */
-    protected function saveInterest(string $interest): int
+    public function saveInterest(string $interest): int
     {
         $statement = $this->db->prepare('
             INSERT INTO interest 
@@ -270,11 +237,17 @@ class UserStorage extends AbstractStorage
      * @return bool
      * @throws RuntimeException
      */
-    protected function saveUserInterest(int $userId, array $interestIds): bool
+    public function saveUserInterest(int $userId, array $interestIds): bool
     {
         $interestsValues = [];
         foreach ($interestIds as $interestId) {
             $interestsValues[] = '(' . $userId . ', ' . $interestId . ')';
+        }
+
+        $this->query('DELETE FROM user_interest WHERE userId = ' . $userId);
+
+        if (empty($interestIds)) {
+            return true;
         }
 
         return $this->query('
@@ -283,6 +256,40 @@ class UserStorage extends AbstractStorage
             VALUES 
                 ' . implode(',', $interestsValues) . '
             '
-        )->execute();
+        )->rowCount() > 0;
     }
+
+    /**
+     * @param array $userInterests
+     * @return bool
+     * @throws RuntimeException
+     */
+    public function saveUserInterestMass(array $userInterests): bool
+    {
+        $userIds = [];
+        $interestsValues = [];
+        foreach ($userInterests as $userId => $interests) {
+            $userIds[] = $userId;
+            foreach ($interests as $interestId) {
+                $interestsValues[] = '(' . $userId . ', ' . $interestId . ')';
+            }
+        }
+
+        if (!empty($userIds)) {
+            $this->query('DELETE FROM user_interest WHERE userId IN (' . implode(',', $userIds) . ')');
+        }
+
+        if (empty($interestsValues)) {
+            return true;
+        }
+
+        return $this->query('
+            INSERT INTO user_interest 
+                (userId, interestId) 
+            VALUES 
+                ' . implode(',', $interestsValues) . '
+            '
+            )->rowCount() > 0;
+    }
+
 }
