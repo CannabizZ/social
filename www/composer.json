@@ -11,6 +11,7 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "couchbase/couchbase": "^4.0"
   }
 }

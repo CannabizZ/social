@@ -12,6 +12,8 @@ services:
       - ./logs:/var/log/nginx
     links:
       - php
+    networks:
+      - social-network
   php:
     container_name: social-php-fpm
     build: ./images/php
@@ -24,6 +26,8 @@ services:
       DB_PASSWORD: password
       DB_MASTER_HOSTS: mysql
       DB_SLAVE_HOSTS: mysql
+    networks:
+      - social-network
   mysql:
     container_name: social-mysql
     image: mysql:8
@@ -35,3 +39,44 @@ services:
       MYSQL_DATABASE: social
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_PASSWORD: password
+    networks:
+      - social-network
+  mysql-shard-1:
+    container_name: social-mysql-shard-1
+    image: mysql:5.7.30
+    volumes:
+      - ./shards/shard1:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: dialogs
+      MYSQL_USER: test
+      MYSQL_PASSWORD: pzjqUkMnc7vfNHET
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - social-network
+  mysql-shard-2:
+    container_name: social-mysql-shard-2
+    image: mysql:5.7.30
+    volumes:
+      - ./shards/shard2:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: dialogs
+      MYSQL_USER: test
+      MYSQL_PASSWORD: pzjqUkMnc7vfNHET
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - social-network
+  proxysql:
+    container_name: social-proxysql
+    image: proxysql/proxysql
+    ports:
+      - "16032:6032"
+      - "16033:6033"
+      - "16070:6070"
+    volumes:
+      - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
+    networks:
+      - social-network
+
+networks:
+  social-network:
+    driver: bridge

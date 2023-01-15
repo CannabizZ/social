@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0dd46b5a87d26b71dceb204f1f33c7d0",
-    "packages": [],
+    "content-hash": "8efbe60c81952efb6697f0607d75b56e",
+    "packages": [
+        {
+            "name": "couchbase/couchbase",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:couchbase/couchbase-php-client.git",
+                "reference": "12ca305b72d36cc60ebffca0aa2c7e1cfc3ab803"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/couchbase/couchbase-php-client/zipball/12ca305b72d36cc60ebffca0aa2c7e1cfc3ab803",
+                "reference": "12ca305b72d36cc60ebffca0aa2c7e1cfc3ab803",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*"
+            },
+            "require-dev": {
+                "ext-sockets": "*",
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Couchbase\\": "Couchbase/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Avseyev",
+                    "email": "sergey.avseyev@gmail.com"
+                }
+            ],
+            "description": "The PHP client library provides fast access to documents stored in a Couchbase Server.",
+            "time": "2022-05-11T08:48:37+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",

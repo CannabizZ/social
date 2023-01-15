@@ -1,6 +1,7 @@
 <?php
 
 use App\Base\Router;
+use App\Controller\DialogsController;
 use App\Controller\MigrateController;
 use App\Controller\PageController;
 use App\Controller\UserController;
@@ -28,6 +29,9 @@ Router::get('/user/search', UserController::class, 'search');
  */
 Router::get('/page/([\d]+)', PageController::class, 'get');
 Router::post('/user/([\d]+)/page', PageController::class, 'create');
+
+Router::post('/user/([\d]+)/messages', DialogsController::class, 'create');
+Router::get('/user/([\d]+)/messages', DialogsController::class, 'get');
 
 
 /**
