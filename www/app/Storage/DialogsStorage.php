@@ -54,12 +54,14 @@ class DialogsStorage
                 WHERE 
                     shardId = " . $this->getShardId($userId, $recipientId) . " AND
                     (
-                        userId = " . $userId . " AND
-                        recipientId = " . $recipientId . "
-                    ) OR
-                    (
-                        recipientId = " . $userId . " AND
-                        userId = " . $recipientId . "
+                        (
+                            userId = " . $userId . " AND
+                            recipientId = " . $recipientId . "
+                        ) OR
+                        (
+                            recipientId = " . $userId . " AND
+                            userId = " . $recipientId . "
+                        )
                     )
                 ORDER BY created DESC
             ";
