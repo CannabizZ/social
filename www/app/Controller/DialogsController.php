@@ -11,8 +11,6 @@ use Throwable;
 
 class DialogsController extends AbstractController
 {
-
-
     /**
      * @param int $userId
      * @return Response
@@ -52,8 +50,15 @@ class DialogsController extends AbstractController
             throw new ValidationException('Empty recipientId');
         }
 
+        $limit = (int) ($this->request->getQuery()['limit'] ?? 50);
+        if ($limit > 500) {
+            throw new ValidationException('Max limit - 500');
+        }
+
+        $offset = (int) ($this->request->getQuery()['offset'] ?? 0);
+
         $storage = new DialogsStorage();
-        $messages = $storage->get($userId, $recipientId);
+        $messages = $storage->get($userId, $recipientId, $limit, $offset);
 
         return $this->responseSuccess($messages);
     }

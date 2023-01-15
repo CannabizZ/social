@@ -44,10 +44,12 @@ class DialogsStorage
     /**
      * @param int $userId
      * @param int $recipientId
+     * @param int $limit
+     * @param int $offset
      * @return array
      * @throws RuntimeException
      */
-    public function get(int $userId, int $recipientId): array
+    public function get(int $userId, int $recipientId, int $limit, int $offset): array
     {
         $sql = "
                 SELECT userId, recipientId, message, created FROM  history 
@@ -64,6 +66,7 @@ class DialogsStorage
                         )
                     )
                 ORDER BY created DESC
+                LIMIT " . $limit . " OFFSET " . $offset . "
             ";
 
         $result = $this->db->query($sql);
