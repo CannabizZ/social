@@ -12,6 +12,7 @@
   "minimum-stability": "dev",
   "require": {
     "ext-pdo": "*",
-    "couchbase/couchbase": "^4.0"
+    "couchbase/couchbase": "^4.0",
+    "php-amqplib/php-amqplib": ">=3.0"
   }
 }

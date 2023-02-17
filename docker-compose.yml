@@ -10,6 +10,7 @@ services:
       - ./hosts:/etc/nginx/conf.d
       - ./www:/var/www
       - ./logs:/var/log/nginx
+      - ./certs:/certs
     links:
       - php
     networks:
@@ -19,8 +20,11 @@ services:
     build: ./images/php
     links:
       - mysql
+    ports:
+      - "12345:12345"
     volumes:
       - ./www:/var/www
+      - ./certs:/certs
     environment:
       DB_USER: secret
       DB_PASSWORD: password

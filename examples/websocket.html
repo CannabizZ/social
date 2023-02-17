@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title> WebSocket PHP Example </title>
+    <script type="text/javascript">
+        let senderService = null;
+        let subscribeService = null;
+        let messagesList = null;
+
+
+        let echo_service;
+        append = function (text) {
+            messagesList.insertAdjacentHTML('beforeend',
+                "<li>" + text + ";</li>"
+            );
+        }
+        window.onload = function () {
+            //startSenderService();
+            messagesList = document.getElementById("messages");
+        }
+
+        function startSenderService() {
+            if (senderService !== null) {
+                return;
+            }
+            senderService = new WebSocket('wss://social.dev:12345/ws');
+            senderService.onmessage = function (event) {
+                append(event.data)
+            }
+            senderService.onopen = function () {
+                append("Connected to WebSocket!");
+            }
+            senderService.onclose = function () {
+                append("Connection closed");
+            }
+            senderService.onerror = function (event) {
+                append("Error happens");
+            }
+        }
+
+        function sendMessage() {
+            if (!(senderService instanceof WebSocket)) {
+                alert('Error send');
+                return false;
+            }
+
+            let data = {};
+            data.id = document.forms.sender.sender_id.value;
+            data.action = 'new';
+            data.message = document.forms.sender.message.value;
+            senderService.send(JSON.stringify(data));
+            return false;
+        }
+
+        function startSubscribe() {
+            if (subscribeService !== null) {
+                return false;
+            }
+
+            subscribeService = new WebSocket('wss://social.dev:12345/ws');
+            document.forms.subscribe.subs.disabled = true;
+
+            subscribeService.onmessage = function (event) {
+                append(event.data)
+            }
+            subscribeService.onopen = function () {
+                append("Connected to WebSocket!");
+                let data = {};
+                data.ids = document.forms.subscribe.ids.value;
+                subscribeService.send(JSON.stringify(data));
+                document.forms.subscribe.subs.value = 'Слушаем...';
+            }
+            subscribeService.onclose = function () {
+                append("Connection closed");
+            }
+            subscribeService.onerror = function (event) {
+                append("Error happens");
+                document.forms.subscribe.subs.disabled = false;
+            }
+
+            return false;
+        }
+
+    </script>
+</head>
+
+<body>
+
+<!--
+<h2>Отправка сообщения</h2>
+<form name="sender" style="border: 1px solid #333333; padding: 10px;" action="/" onsubmit="return sendMessage();">
+    <div><label>ID отправителя: <input value="1" name="sender_id" required /></label><br/></div><br/>
+    <div><label>Сообщение: <input placeholder="Текст сообщения" name="message" required/></label> <input type="submit"/><br/></div>
+</form>
+-->
+<br/>
+<br/>
+<h2>Подписка на сообщения</h2>
+<form name="subscribe" style="border: 1px solid #333333; padding: 10px;" action="/" onsubmit="return startSubscribe();">
+    <div><label>ID пользователей (через запятую): <input value="1,2" name="ids" required/></label><br/></div>
+    <br/>
+    <div><input name="subs" type="submit"/><br/></div>
+</form>
+
+<ul id="messages"></ul>
+
+<!--
+<div>
+    Message: <input value="Hello!" type="text" id="message" /><br><br>
+    <input type="button" value="Submit" onclick="sendMessage(event)" /><br>
+    <ul id="websocket_events"></ul>
+</div>
+-->
+
+
+</body>
+
+</html>

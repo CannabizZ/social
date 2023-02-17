@@ -2,3 +2,5 @@
 /logs/
 /.idea/
 /www/vendor/
+/shards/shard1/*
+/shards/shard2/*

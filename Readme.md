@@ -32,3 +32,36 @@
 
 #### Get messages
 `curl --location --request GET 'http://social.dev/user/16/messages?recipientId=9'`
+
+## Websocket messages with RabbitMQ
+
+### Start RabbitMQ nodes
+
+#### Start node1
+`docker run -d --hostname node1.rabbit --net social_social-network --name rabbitNode1 -p "15673:15672" -e "RABBITMQ_USE_LONGNAME=true" -e RABBITMQ_ERLANG_COOKIE="cookie" rabbitmq:3-management`
+
+#### Start node2
+`docker run -d --hostname node2.rabbit --net social_social-network --name rabbitNode2 -p "15674:15672" -e "RABBITMQ_USE_LONGNAME=true" -e RABBITMQ_ERLANG_COOKIE="cookie" rabbitmq:3-management`
+
+#### Make cluster
+
+`docker exec rabbitNode2 rabbitmqctl stop_app`
+
+`docker exec rabbitNode2 rabbitmqctl join_cluster rabbit@node1.rabbit`
+
+`docker exec rabbitNode2 rabbitmqctl start_app`
+
+#### Run websocket server
+
+`docker exec social-php-fpm php ws/server.php`
+
+#### Test send to queue
+
+`docker exec social-php-fpm php ws/sendMessage.php {userId} {message}`
+
+Example (sending message 'hello' by userId = 1): 
+
+`docker exec social-php-fpm php ws/sendMessage.php 1 hello` 
+
+Example HTML file: `examples/websocket.html`
+

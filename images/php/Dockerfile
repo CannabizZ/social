@@ -19,6 +19,7 @@ RUN set -eux; \
             libmcrypt-dev \
             libzip-dev \
             unzip \
+            librabbitmq-dev \
             libonig-dev; \
     rm -rf /var/lib/apt/lists/*
 
@@ -26,6 +27,7 @@ RUN set -eux; \
     # Install the PHP pdo_mysql extention
     docker-php-ext-install pdo_mysql; \
     docker-php-ext-install zip; \
+    docker-php-ext-install sockets; \
     # Install the PHP gd library
     docker-php-ext-configure gd \
             --prefix=/usr \
@@ -33,7 +35,9 @@ RUN set -eux; \
             --with-webp \
             --with-xpm \
             --with-freetype; \
-    docker-php-ext-install gd
+    docker-php-ext-install gd; \
+    pecl install amqp; \
+    docker-php-ext-enable amqp
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
