@@ -96,6 +96,9 @@ class WebsocketServer
                             break;
                         case 'text':
                             $msg = json_decode($payload['payload'], true);
+
+                            //TODO Список id друзей получать из списка авторизованного пользователя
+
                             $ids = explode(',', $msg['ids']);
 
                             if (!$this->send('Listen messages from friends by ids: ' . $msg['ids'], $connect)) {
