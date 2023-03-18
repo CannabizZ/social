@@ -9,3 +9,4 @@
 /tarantool/log/
 !/mysql/my.cnf
 /mysql_tarantool-replication/
+/mysql_tarantool-replication/

@@ -1,0 +1,24 @@
+mysql:
+    host: 127.0.0.1
+    port: 3306
+    user: root
+    password: secret
+    connect_retry: 15 # seconds
+
+tarantool:
+    host: 127.0.0.1:3301
+    binlog_pos_space: 512
+    binlog_pos_key: 0
+    connect_retry: 15 # seconds
+    sync_retry: 1000 # milliseconds
+
+mappings:
+    - database: social
+      table: user
+      columns: [ id, firstName, lastName, years, sex, city, password ]
+      space: 513
+      key_fields: [ 0 ]
+      # insert_call: function_name
+      # update_call: function_name
+      # delete_call: function_name
+
