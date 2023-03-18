@@ -39,6 +39,7 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/my.cnf
     environment:
       MYSQL_DATABASE: social
       MYSQL_ROOT_PASSWORD: secret
@@ -78,6 +79,18 @@ services:
       - "16070:6070"
     volumes:
       - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
+    networks:
+      - social-network
+  tarantool:
+    container_name: social-tarantool
+    image: tarantool/tarantool:latest
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool/lib:/var/lib/tarantool
+      - ./tarantool/log:/var/log/tarantool
+      - ./tarantool/instances.available:/usr/local/etc/tarantool/instances.available
+      - ./tarantool/local:/opt/tarantool
     networks:
       - social-network
 

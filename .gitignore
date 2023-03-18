@@ -4,3 +4,8 @@
 /www/vendor/
 /shards/shard1/*
 /shards/shard2/*
+/mysql-tarantool-replication/*
+/tarantool/lib/
+/tarantool/log/
+!/mysql/my.cnf
+/mysql_tarantool-replication/
