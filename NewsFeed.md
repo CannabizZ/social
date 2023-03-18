@@ -24,7 +24,7 @@
 
 ### Get news feed
 
-    `curl --location --request GET 'http://social.dev/user/{userId}/post'`
+    `curl --location --request GET 'http://social.dev/user/{userId}/posts'`
 
 
 
